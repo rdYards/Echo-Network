@@ -1,0 +1,167 @@
+@font-face {
+    font-family: 'Ringbearer';
+    src: url('Fonts/RingbearerMedium-51mgZ.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    font-family: 'Ringbearer', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+body {
+    display: flex;
+}
+
+/* Map */
+
+.map {
+    width: 40%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    border-right: 6px ridge black;
+} .map img {
+    top: 0;
+    width: 100%;
+    height: 95%;
+}
+
+.map_underlay {
+    z-index: 0;
+}.map_overlay {
+    z-index: 1;
+} 
+
+.hidden {
+    display: none;
+}
+.activebtn {
+    color: white;
+    background-image: url(Backgrounds/Obsidian_Background.jpg)!important; 
+}
+
+/* Button zone */
+
+.nationbar {
+    border-top: black;
+    display: flex;
+    flex-wrap: wrap;
+    height: 40%;
+    background-image: url(Backgrounds/Spruce_Background.jpg);
+    align-content: flex-start;
+    flex-grow: 1;
+}
+
+.nationbtn {
+    cursor: pointer;
+    flex: 1 0 20%;
+    padding: 5px;
+    margin: 3px;
+    font-size: large;
+    font-weight: bolder;
+    background-image: url(Backgrounds/Stone_Background.jpg);
+    border: solid black;
+} .nationbtn:active {
+    background-image: url(Backgrounds/Blackstone_Background.jpg);
+}
+
+/* National Page Information */
+
+.nationinfo {
+    width: 60%;
+    height: 100vh;
+    background-color: lightgray;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+.nationpage {
+    padding: 2% 1% 0% 1%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* box-shadow:0px 0px 0px 10px red inset; */
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    height: 6vh;
+    border-bottom: solid;
+} .title p {
+    font-size: 6.5vh;
+    padding: 1vh;
+    font-weight: bolder;
+    flex: 1;
+    margin: 0;
+}
+.nationflag {
+    float: right;
+    height: 100%;
+}
+
+.pagenav {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-end;
+    /* border-bottom: solid black; */
+} .pagebtn {
+    cursor: pointer;
+    flex: 1 0 20%;
+    flex-basis: 20%;
+    padding: .4vh;
+    margin: .5vh;
+    font-size: larger;
+    background-image: url(Backgrounds/Stone_Background.jpg);
+    border: solid black;
+} .pagebtn:active {
+    background-image: url(Backgrounds/Blackstone_Background.jpg);
+}
+
+.infopage {
+    width: 100%;
+    flex: 1;
+    /* box-shadow:0px 0px 0px 10px red inset; */
+}
+.image {
+    float: right;
+    height: 300px;
+}
+
+#history {
+    display: none;
+    background-color: red;
+} #geography {
+    display: inline;
+    background-color: yellow;
+    box-shadow:0px 0px 0px 10px red inset;
+} #players {
+    display: none;
+    background-color: blue;
+} #economy {
+    display: none;
+    background-color: green;
+}
+
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+} .content-wrapper {
+    overflow: hidden;
+} .active, .collapsible:hover {
+    background-color: #555;
+} .active + .content {
+    max-height: 50vh;
+} .content {
+    padding: 0 18px;
+    background-color: #f1f1f1;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
