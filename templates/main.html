@@ -10,34 +10,18 @@
     </head>
     <body>
         <section class="map">
-            <img class="map_underlay" src="LoreWorks_Map_1.1.1.png">
+            <img class="map_underlay" src="LoreWorks_Map.png">
             <section class="nationbar">
-                <button class="nationbtn">Bogwater</button>
-                <button class="nationbtn">Costa Marina</button>
-                <button class="nationbtn">Crassus</button>
-                <button class="nationbtn">Cortosa</button>
-                <button class="nationbtn">Drakeheim</button>
-                <button class="nationbtn">Eire</button>
-                <button class="nationbtn">Epheria</button>
-                <button class="nationbtn">Frostmare</button>
-                <button class="nationbtn">Galinor</button>
-                <button class="nationbtn activebtn">HeartLands</button>
-                <button class="nationbtn">Khazel Zhalem</button>
-                <button class="nationbtn">Laputria</button>
-                <button class="nationbtn">Salacia</button>
-                <button class="nationbtn">Sapientia</button>
-                <button class="nationbtn">Thoronor</button>
-                <button class="nationbtn">Uzacan</button>
-                <button class="nationbtn">Veteres</button>
-                <button class="nationbtn">Wakkland</button>
-                <button class="nationbtn">Nomad</button>
+                {% for nation in nations %}
+                <button class="nationbtn" id="{{ nation }}">{{ nation }}</button>
+                {% endfor %}
             </section>
         </section>
         <section class="nationinfo">
             <section class="nationpage" id="Heartlands">
                 <section class="title">
                     <p>Heartlands</p>
-                    <img class="nationflag" src="Nation_Flag/Test_Flag.png">
+                    <div class="exampleimage"></div>
                 </section>
                 <section class="pagenav">
                     <button class="pagebtn activebtn">History</button>
@@ -47,21 +31,15 @@
                 </section>
                 <section class="infopage" id="history">
                     <p> The heartlands, that's what the first Rivish settlers called this place, as it is indeed the very heart and soul of the Riverlands. Located in the dead centre of the Riverlands, the heartlands was the place where the Rivish settlers first set foot upon their arrival to Drevhall through the ancient portal, making it their new home. In fact, the heartlands isn't only the first settlement of the Rivish people, as it is also rumoured to be home to multiple ancient civilizations lost to the ages, revealed through the cataclysmic events of the great flood by the opening of the Ivy Hills ravine. </p>
-                    <img src="Images/Ivy_Hills-1.webp">
                     <p> These cataclysmic events have been recorded by the outstanding Rivish cartographers, who documented the changes to the landscape of the continent by mapping out all of the Riverlands before and after the events of the great flood. These maps can be found at one of the main settlements of the Heartlands, Ivy Hills. </p>
-                    <img src="Images/Heartlands_World_Map.webp">
                     <p> Being the only real housing complex in the Heartlands, Ivy hills is the first place that most newcomers visit upon their arrival to Drevhall, helping them get setup, settled and prepared to explore the rest of the world. Getting its name from the Ivy bushes that grow all over this region of the Heartlands, Ivy hills offers lodging for those seeking to either lease, or own. </p>
-                    <img src="Images/Ivy_Hills-2.webp">
                     <p> Next up following Ivy Hills, the newcomer's journey would take us east, to the main attraction of the Heartlands, the Commercium. The Commercium is an iconic place in all of the Riverlands, as it is considered to be the centre of commerce, competition, and business, while also offering a variety of entertaining activities. </p>
-                    <img src="Images/Shopping_Center.webp">
                     <p> Directly south of the Commercium, lies one of the biggest fortresses in all of Drevhall, Fort Artem'p. While it can be used as a great defensive location, it is actually a blank canvas to any creative mind that may come across this area. </p>
-                    <img src="Images/Map_Maker.webp">
                     <p>
                         And last but not least, the Maze of Doom is the last step on the Newcome's journey. This is a treacherous place, that wields great rewards. The perfect head start, as it will hone all of your survival skills, as well as provide you with immense wealth upon its completion. The maze will endure anyone brave enough to try it, the real question is, will you endure the maze…..
                         <br>
                         While the heartlands is already quite the attraction in and of itself, there's one more thing that makes it even more special than any other area within the Riverlands. As it was agreed upon by the first Rivish settlers, the heartlands is to forever remain autonomous, never to have a ruler, protecting it from any potential conflict and destruction. This makes the heartlands a great place to settle and open your business, however this may not be for everyone. Just like someone once said, where there is no risk, there's no reward… 
                     </p>
-                    <img src="Images/Maze_of_Doom.webp">
                 </section>
                 <section class="infopage" id="geography">
                     <button type="button" class="collapsible">Map of the Riverlands at Ivy Hills</button>
@@ -88,7 +66,7 @@
                 <section class="infopage" id="players">
                     <button type="button" class="collapsible">IC_Name, IC_Nickname_1, IC_Nickname_2 - (OOC_Discord_Name)</button>
                     <div class="content">
-                        <img class="profile" src="Images/King_David.webp">
+                        <div class="exampleimage"></div>
                         <h2>General Info</h2>
                         <ul class="list">
                             <li>Titles: ___</li>
@@ -142,7 +120,7 @@
                     </div>
                     <button type="button" class="collapsible">C0PP3R-333, Copperheart, Thr333s - (b29flier)</button>
                     <div class="content">
-                        <img class="profile" src="Images/Copperheart_Concept_1.png">
+                        <div class="exampleimage"></div>
                         <h2>General Info</h2>
                         <ul class="list">
                             <li>Titles: N/A</li>
