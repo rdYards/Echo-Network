@@ -6,8 +6,13 @@ The project will focus on implementing a dynamic and efficient approach to reduc
  - The backend of the project will be developed using the Python programming language, chosen due to the developer's proficiency and expertise in this language.
  - The ultimate goal of the project is to create a public website, allowing users to access and explore the nations and players effortlessly.
 
-## Lore: (Note nothing has been approved)
+## Lore: (Note* Prone to Change)
 The project will remain OOC in case something irl happens and the project must stop. But at version 1.0.0 the project will move to a IC event in which player will access it through the echo book.
+
+### Ideas
+ - Based off of forgotten magic restored by IC robot, Copper-333. Restored as he remade his home.
+ - A few tinkering moments here, reapply the logic already used for the echo book.
+ - Divine intervention
 
 # How to install:
 1. Either download a zip (remember to uncompress it) or use git clone through a terminal
