@@ -1,65 +1,63 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // Get references to the buttons and sections
-    const historyBtn = document.querySelector(".pagebtn:nth-child(1)");
-    const geographyBtn = document.querySelector(".pagebtn:nth-child(2)");
-    const playersBtn = document.querySelector(".pagebtn:nth-child(3)");
-    const economyBtn = document.querySelector(".pagebtn:nth-child(4)");
+const app = new Vue({
+    el: '#app',
+    data: {
+        selectedNation: '', // Stores the currently selected nation
+        nations: [], // Initialize with empty array to avoid the reactive property warning
+        pages: ['History', 'Geography', 'Players', 'Economy'],
+        currentPage: 'History', // To track the currently selected page
+        htmlContent: '', // To store the history HTML content
+        referencedImages: [], // To store the referenced images
+    },
+    methods: {
+        // Method to fetch the list of nations from the server
+        fetchNations() {
+            fetch('/get_nations')
+                .then(response => response.json())
+                .then(data => {
+                    this.nations = data; // Update the nations array with the fetched data
+                })
+                .catch(error => {
+                    console.error('Error fetching nations:', error);
+                });
+        },
+        selectNation(nationName) {
+            this.selectedNation = nationName;
+            this.currentPage = 'History'; // Reset to the History page when a new nation is selected
+            this.fetchHistory(nationName); // Fetch history data for the selected nation
+        },
+        selectPage(page) {
+            this.currentPage = page;
+        },
+        // Method to fetch history data for the selected nation from the server
+        fetchHistory(nationName) {
+            fetch(`/history/${nationName}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update data properties with fetched data
+                    this.htmlContent = data.html_content;
+                    this.referencedImages = data.referenced_images;
+                })
+                .catch(error => {
+                    console.error(`Error fetching history for ${nationName}:`, error);
+                });
+        },
+        // Method to load and display the Nation_Flag image
+        updateTitleSection(nationName) {
+            this.selectedNation = nationName;
 
-    const historySection = document.getElementById("history");
-    const geographySection = document.getElementById("geography");
-    const playersSection = document.getElementById("players");
-    const economySection = document.getElementById("economy");
-
-    // Function to hide all sections
-    function hideAllSections() {
-        historySection.style.display = "none";
-        geographySection.style.display = "none";
-        playersSection.style.display = "none";
-        economySection.style.display = "none";
-    }
-
-    // Function to show the selected section
-    function showSection(section, btn) {
-        hideAllSections();
-        section.style.display = "block";
-
-        // Add .activebtn class to the clicked button and remove from others
-        const buttons = document.querySelectorAll(".pagebtn");
-        buttons.forEach((button) => button.classList.remove("activebtn"));
-        btn.classList.add("activebtn");
-    }
-
-    // Event listeners for button clicks
-    historyBtn.addEventListener("click", function () {
-        showSection(historySection, historyBtn);
-    });
-
-    geographyBtn.addEventListener("click", function () {
-        showSection(geographySection, geographyBtn);
-    });
-
-    playersBtn.addEventListener("click", function () {
-        showSection(playersSection, playersBtn);
-    });
-
-    economyBtn.addEventListener("click", function () {
-        showSection(economySection, economyBtn);
-    });
-    
-
-    var coll = document.getElementsByClassName("collapsible");
-    var i;
-    
-    for (i = 0; i < coll.length; i++) {
-        coll[i].addEventListener("click", function() {
-            this.classList.toggle("active");
-            var content = this.nextElementSibling;
-        
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-            }
-        });
-    }
+            const imageSrc = `/Nations/${nationName}/Nation_Flag.png`;
+            loadImage(imageSrc)
+                .then(() => {
+                    // The rest of the image loading logic
+                    // ...
+                })
+                .catch(error => {
+                    console.error(`Error loading Nation_Flag for ${nationName}:`, error);
+                });
+        },
+    },
+    created() {
+        // Fetch the list of nations when the app is created
+        this.fetchNations();
+    },
 });

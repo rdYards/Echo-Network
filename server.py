@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, jsonify
 
 app = Flask(__name__)
 
@@ -12,16 +12,19 @@ def get_nations_list():
         for folder_name in os.listdir(nations_directory):
             if os.path.isdir(os.path.join(nations_directory, folder_name)):
                 nations.append(folder_name)
-
+    print(nations)
     return nations
 
-# Serve the frontend files from a directory
+# Serve the Vue.js app
 @app.route('/')
-def serve_frontend():
-    nations = get_nations_list()
-    return render_template('main.html', nations=nations)
+def serve_vue_app():
+    return render_template('vue_app.html')
 
 # Serve the JavaScript files
+@app.route('/vue.js')
+def serve_vue():
+    return send_from_directory('', 'vue.js')
+
 @app.route('/index.js')
 def serve_js():
     return send_from_directory('', 'index.js')
@@ -54,7 +57,19 @@ def serve_image4():
 def serve_font():
     return send_from_directory('Fonts', 'RingbearerMedium-51mgZ.ttf')
 
+# Get Nations
+@app.route('/get_nations')
+def get_nations():
+    nations_list = get_nations_list()
+    return jsonify(nations_list)
 
+# Endpoint to fetch history JSON data
+@app.route('/history/<nation_name>')
+def serve_history(nation_name):
+    # Fetch history data and referenced images as JSON
+    # You can use the same logic as before to extract data and images from HTML
+    # and return it as JSON instead of rendering HTML
+    return jsonify({'nation_name': nation_name, 'html_content': '...', 'referenced_images': [...]})
 
 if __name__ == '__main__':
     # Run the Flask application on a local IP address and port

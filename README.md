@@ -13,6 +13,7 @@ The project will remain OOC in case something irl happens and the project must s
  - Based off of forgotten magic restored by IC robot, Copper-333. Restored as he remade his home.
  - A few tinkering moments here, reapply the logic already used for the echo book.
  - Divine intervention
+ - Servers and display monitors, that are wirelessly linked to Copper-333 processing system, so its all connected to Copper-333
 
 # How to install:
 1. Either download a zip (remember to uncompress it) or use git clone through a terminal

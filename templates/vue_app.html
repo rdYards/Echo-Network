@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Map of Rivers</title>
+        <link rel="stylesheet" href="style.css"/> 
+    </head>
+    <body>
+        <div id="app">
+            <section class="container">
+                <section class="map">
+                    <img class="map_underlay" src="LoreWorks_Map.png">
+                    <!-- Update the nationbar section -->
+                    <section class="nationbar">
+                        <button
+                            v-for="nation in nations"
+                            :key="nation"
+                            class="nationbtn"
+                            @click="selectNation(nation)"
+                        >
+                            {{ nation }}
+                        </button>
+                    </section>
+                </section>
+                
+                <!-- Update the nationinfo section -->
+                <section class="nationinfo">
+                    <!-- Update the title section -->
+                    <section class="title">
+                        <p id="selected_nation">{{ selectedNation }}</p>
+                        <div id="selected_nation_img">
+                            <!-- The Nation_Flag image will be loaded here -->
+                            <img :src="`/Nations/${selectedNation}/Nation_Flag.png`" alt="Nation Flag">
+                        </div>
+                    </section>
+
+                    <!-- Update the pagenav section -->
+                    <section class="pagenav">
+                        <button
+                            v-for="page in pages"
+                            :key="page"
+                            class="pagebtn"
+                            :class="{ activebtn: page === currentPage }"
+                            @click="selectPage(page)"
+                        >
+                            {{ page }}
+                        </button>
+                    </section>
+                    
+                    <!-- Update the infopage sections -->
+                    <section class="infopage" id="history" v-show="currentPage === 'History'"></section>
+                    <section class="infopage" id="geography" v-show="currentPage === 'Geography'">
+                        <!-- ... Content for Geography page -->
+                    </section>
+                    <section class="infopage" id="players" v-show="currentPage === 'Players'">
+                        <!-- ... Content for Players page -->
+                    </section>
+                    <section class="infopage" id="economy" v-show="currentPage === 'Economy'">
+                        <!-- ... Content for Economy page -->
+                    </section>
+                </section>
+            </section>
+        </div>
+        <script src="vue.js"></script>
+        <script src="index.js"></script>
+    </body>
+</html>
