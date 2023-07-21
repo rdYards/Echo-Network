@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, send_from_directory, jsonify
+import json
 
 app = Flask(__name__)
 
@@ -63,13 +64,25 @@ def get_nations():
     nations_list = get_nations_list()
     return jsonify(nations_list)
 
+# Serve the Nation_Flag.png image for Example_Nation
+@app.route('/Nations/<nation_name>/Nation_Flag.png')
+def serve_nation_flag(nation_name):
+    # Replace 'path/to/your/Nation_Flag.png' with the actual path to the image on your file system
+    # Make sure the image is in the correct folder structure under the static directory
+    return send_from_directory('Nations/' + nation_name, 'Nation_Flag.png')
+
 # Endpoint to fetch history JSON data
 @app.route('/history/<nation_name>')
 def serve_history(nation_name):
-    # Fetch history data and referenced images as JSON
-    # You can use the same logic as before to extract data and images from HTML
-    # and return it as JSON instead of rendering HTML
-    return jsonify({'nation_name': nation_name, 'html_content': '...', 'referenced_images': [...]})
+    # Load data from the history JSON file
+    with open('Nations/' + nation_name + '/history/history.json', 'r') as file:
+        history_data = json.load(file)
+    
+    # Check if the specified nation exists in the JSON data
+    if nation_name in history_data:
+        return jsonify(history_data[nation_name])
+    else:
+        return jsonify({'error': 'Nation not found'})
 
 if __name__ == '__main__':
     # Run the Flask application on a local IP address and port

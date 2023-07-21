@@ -15,6 +15,13 @@ const app = new Vue({
                 .then(response => response.json())
                 .then(data => {
                     this.nations = data; // Update the nations array with the fetched data
+                    console.log(this.nations);
+
+                    // Default to opening the first nation
+                    if (this.nations.length > 0) {
+                        this.selectedNation = this.nations[0];
+                        this.fetchHistory(this.selectedNation); // Fetch history data for the selected nation
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching nations:', error);
@@ -47,13 +54,26 @@ const app = new Vue({
 
             const imageSrc = `/Nations/${nationName}/Nation_Flag.png`;
             loadImage(imageSrc)
-                .then(() => {
-                    // The rest of the image loading logic
-                    // ...
-                })
-                .catch(error => {
-                    console.error(`Error loading Nation_Flag for ${nationName}:`, error);
-                });
+            .then(() => {
+                // The rest of the image loading logic
+                // Get the element that will hold the image
+                const titleSection = document.getElementById('selected_nation_img');
+                if (titleSection) {
+                    // Clear any existing image
+                    titleSection.innerHTML = '';
+
+                    // Create an img element
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageSrc;
+                    imgElement.alt = 'Nation Flag';
+
+                    // Append the img element to the title section
+                    titleSection.appendChild(imgElement);
+                }
+            })
+            .catch(error => {
+                console.error(`Error loading Nation_Flag for ${nationName}:`, error);
+            });
         },
     },
     created() {
