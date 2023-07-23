@@ -7,12 +7,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Ringbearer', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 .container {
     display: flex; /* Use flexbox */
-}
-body {
-    font-family: 'Ringbearer', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .nationbar, .infopage {
@@ -86,8 +84,8 @@ body {
     height: 6vh;
     border-bottom: solid;
 } .title p {
-    font-size: 6.5vh;
-    padding: 0 1vh 1vh 1vh;
+    font-size: 6.3vh;
+    padding: 1.2vh 1vh 1vh 1vh;
     font-weight: bolder;
     flex: 1;
     margin: 0;
@@ -123,8 +121,10 @@ body {
 }
 
 /* Infopage content sections */
-#history {
-    display: inline;
+#history h2 {
+    font-size: 2vh;
+    text-align: center;
+    padding: 1%;
 } #history p {
     padding: 0 1%;
     font-size: 1.7vh;
@@ -136,11 +136,9 @@ body {
     margin-right: auto;
     width: 50%;
 }
-#geography {
-    display: none;
-}
-#players {
-    display: none;
+
+#players h1 {
+    margin: .2%;
 } #players h2 {
     margin-top: 1%;
 } #players .profile {
@@ -149,10 +147,10 @@ body {
     padding-top: 1.5%;
 } #players .list {
     list-style-type: circle;
+} #players div {
+    width: 100%;
 }
-#economy {
-    display: none;
-} #economy h2 {
+#economy h2 {
     margin-top: 1%;
 } #economy .ad {
     margin: 1%;
@@ -181,7 +179,7 @@ body {
 } .content {
     margin-bottom: 1vh;
     font-size: 1.7vh;
-    padding: 0 1.3%;
+    padding: 0 3%;
     background-color: #f1f1f1;
     max-height: 0;
     overflow: hidden;
