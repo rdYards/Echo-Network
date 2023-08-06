@@ -9,7 +9,15 @@
     </head>
     <body>
         <div id="app">
-            <section class="container">
+            <section class="pagenavbar">
+                <button class="pagenavbarbtn" @click="selectOuterPage('nationInfo')"><img src="Icons/map_icon.svg"></button>
+                <!-- <button class="pagenavbarbtn" @click="selectOuterPage('createNation')"><img src="Icons/codesandbox_icon.svg"></button> -->
+                <button class="pagenavbarbtn" @click="selectOuterPage('createPlayer')"><img src="Icons/user_plus_icon.svg"></button>
+                <button class="pagenavbarbtn" @click="selectOuterPage('createShop')"><img src="Icons/shopping_cart_icon.svg"></button>
+                <button class="pagenavbarbtn" @click="selectOuterPage('help')"><img src="Icons/help_circle.svg"></button>
+                <a class="pagenavbarbtn" href="https://github.com/Thr333s/Echo-Network"><img src="Icons/github.svg"></a>
+            </section>
+            <section class="outerPage" id="nationInfo" v-if="currentOuterPage === 'nationInfo'">
                 <section class="map">
                     <img class="map_underlay" src="LoreWorks_Map.png">
                     <!-- Update the nationbar section -->
@@ -25,7 +33,6 @@
                         </button>
                     </section>
                 </section>
-                
                 <!-- Update the nationinfo section -->
                 <section class="nationinfo">
                     <!-- Update the title section -->
@@ -58,12 +65,167 @@
                         <div v-html="geohtmlContent"></div>
                     </section>
                     <section class="infopage" id="players" v-if="currentPage === 'Players'">
-                        <div v-html="playerhtmlContent"></div>
+                        <player-info v-if="currentPage === 'Players'" v-for="(player, index) in filteredPlayers" :key="index" :player="player" />
                     </section>
                     <section class="infopage" id="economy" v-if="currentPage === 'Economy'">
                         <div v-html="shophtmlContent"></div>
                     </section>
                 </section>
+            </section>
+            <section class="outerPage" id="createNation" v-if="currentOuterPage === 'createNation'">
+                <!-- Content for CreateNation page goes here -->
+            </section>
+            <section class="outerPage" id="createPlayer" v-if="currentOuterPage === 'createPlayer'">
+                <div v-if="showModal" class="modal">
+                    <div class="modal-content">
+                        <h3>Select a Player:</h3>
+                        <ul>
+                            <li v-for="file in availableFiles" :key="file" @click="loadPlayerData(file)">{{ file }}</li>
+                        </ul>
+                        <button @click="hideLoadPlayerModal">Close</button>
+                    </div>
+                </div>
+                <div class="leftcreatePlayer">
+                    <h3>Create Player</h3>
+                    <p class="playerhelp">To create a player just fill in the textareas. On the right side you will see a live preview of your character. When finished click on the save button and the file will be added to the servers. To edit hit the button "load".</p>
+                    <section class="createPlayerBtnBar">
+                        <button class="createPlayerBtn" @click="loadPlayerData(characterData)">Load Player</button>
+                        <button class="createPlayerBtn" @click="clearCreatePlayerFormat(characterData)">Clear Formate</button>
+                        <button class="createPlayerBtn" @click="saveCreatePlayerData()">Save Player</button>
+                    </section>
+                    <section>
+                        <h3>Name</h3>
+                        <h4>IC_Name:</h4>
+                        <input v-model="characterData.IC_Name" type="text" placeholder="Enter name">
+                        <h4>IC_Nickname(s):</h4>
+                        <input v-model="characterData.IC_Nickname" type="text" placeholder="Enter nickname(s)">
+                        <h4>OOC_Discord:</h4>
+                        <input v-model="characterData.OOC_Discord_Name" type="text" placeholder="Enter discord">
+                    </section>
+                    <section>
+                        <h3>Load Character Image</h3>
+                        <p class="playerhelp">Note only upload one image!</p>
+                        <input type="file" ref="imageInput" @change="onFileSelected" accept="image/*">
+                    </section>
+                    <section>
+                        <h3>General Info</h3>
+                        <h4>Titles:</h4>
+                        <input v-model="characterData.Titles" type="text" placeholder="Enter title">
+                        <h4>Age:</h4>
+                        <input v-model="characterData.Age" type="int" placeholder="Enter age">
+                        <h4>Date of Birth:</h4>
+                        <input v-model="characterData.Date_of_Birth" type="text" placeholder="Enter date of birth">
+                        <h4>Gender:</h4>
+                        <input v-model="characterData.Gender" type="text" placeholder="Enter gender">
+                        <h4>Race:</h4>
+                        <input v-model="characterData.Race" type="text" placeholder="Enter race">
+                        <h4>Profession(s):</h4>
+                        <input v-model="characterData.Professions" type="text" placeholder="Enter professions">
+                        <h4>Allegiance:</h4>
+                        <input v-model="characterData.Allegiance" type="text" placeholder="Enter allegiance">
+                        <h4>Residence:</h4>
+                        <input v-model="characterData.Residence" type="text" placeholder="Enter residence">
+                        <h4>Status:</h4>
+                        <input v-model="characterData.Status" type="text" placeholder="Enter status">
+                    </section>
+                    <section>
+                        <h3>Appearance</h3>
+                        <h4>Height:</h4>
+                        <input v-model="characterData.Height" type="text" placeholder="Enter height">
+                        <h4>Weight:</h4>
+                        <input v-model="characterData.Weight" type="text" placeholder="Enter weight">
+                        <h4>Hair Color:</h4>
+                        <input v-model="characterData.Hair_Color" type="text" placeholder="Enter hair color">
+                        <h4>Eye Color:</h4>
+                        <input v-model="characterData.Eye_Color" type="text" placeholder="Enter eye color">
+                        <h4>Scars and Tattoos:</h4>
+                        <input v-model="characterData.Scars_and_Tattoos" type="text" placeholder="Enter scars and tattoos">
+                        <h4>Clothing:</h4>
+                        <input v-model="characterData.Clothing" type="text" placeholder="Enter clothing">
+                        <h4>Accessories:</h4>
+                        <input v-model="characterData.Accessories" type="text" placeholder="Enter accessories">
+                        <h4>Equipment:</h4>
+                        <input v-model="characterData.Equiptment" type="text" placeholder="Enter equipment">
+                    </section>
+                    <section>
+                        <h3>Detailed physical description:</h3>
+                        <textarea v-model="characterData.Physical_Description" rows="6" placeholder="Enter Physical Description"></textarea>
+                    </section>
+                    <section>
+                        <h3>Bonds</h3>
+                        <h4>Religion:</h4>
+                        <input v-model="characterData.Religion" type="text" placeholder="Enter religion">
+                        <h4>Nation:</h4>
+                        <input v-model="characterData.Nation" type="text" placeholder="Enter nation">
+                        <h4>Organizations:</h4>
+                        <input v-model="characterData.Organizations" type="text" placeholder="Enter organizations">
+                        <h4>Marriage:</h4>
+                        <input v-model="characterData.Marriage" type="text" placeholder="Enter marriage details">
+                        <h4>Friends:</h4>
+                        <input v-model="characterData.Friends" type="text" placeholder="Enter friends">
+                        <h4>Enemies:</h4>
+                        <input v-model="characterData.Enemies" type="text" placeholder="Enter enemies">
+                        <h4>Pets:</h4>
+                        <input v-model="characterData.Pets" type="text" placeholder="Enter pets">
+                    </section>
+                    <section>
+                        <h3>Backstory:</h3>
+                        <textarea v-model="characterData.Backstory" rows="6" placeholder="Enter Backstory"></textarea>
+                    </section>
+                </div>
+                <div class="rightcreatePlayer">
+                    <div id="players">
+                        <button type="button" class="collapsible" @click="toggleCollapsible">
+                            {{ characterData.IC_Name }}, {{ characterData.IC_Nickname }}, - ({{ characterData.OOC_Discord_Name }})
+                        </button>
+                        <div class="content" style="max-height: 100vh;">
+                            <img class="profile" id="characterData.ImageLocation">
+                            <h2>General Info</h2>
+                            <ul class="list">
+                                <li>Titles: {{ characterData.Titles }}</li>
+                                <li>Age: {{ characterData.Age }}</li>
+                                <li>Date of Birth: {{ characterData.Date_of_Birth }}</li>
+                                <li>Gender: {{ characterData.Gender }}</li>
+                                <li>Race: {{ characterData.Race }}</li>
+                                <li>Profession(s): {{ characterData.Professions }}</li>
+                                <li>Allegiance: {{ characterData.Allegiance }}</li>
+                                <li>Residence: {{ characterData.Residence }}</li>
+                                <li>Status: {{ characterData.Status }}</li>
+                            </ul>
+                            <h2>Appearance</h2>
+                            <ul class="list">
+                                <li>Height: {{ characterData.Height }}</li>
+                                <li>Weight: {{ characterData.Weight }}</li>
+                                <li>Hair Color: {{ characterData.Hair_Color }}</li>
+                                <li>Eye Color: {{ characterData.Eye_Color }}</li>
+                                <li>Scars and Tattoos: {{ characterData.Scars_and_Tattoos }}</li>
+                                <li>Clothing: {{ characterData.Clothing }}</li>
+                                <li>Accessories: {{ characterData.Accessories }}</li>
+                                <li>Equiptment: {{ characterData.Equiptment }}</li>
+                            </ul>
+                            <h1>Detailed physical description</h1>
+                            <p>{{ characterData.Physical_Description }}</p>
+                            <h2>Bonds</h2>
+                            <ul class="list">
+                                <li>Religon: {{ characterData.Religon }}</li>
+                                <li>Nation: {{ characterData.Nation }}</li>
+                                <li>Organizations: {{ characterData.Organizations }}</li>
+                                <li>Marriage: {{ characterData.Marriage }}</li>
+                                <li>Friends: {{ characterData.Friends }}</li>
+                                <li>Enemies: {{ characterData.Enemies }}</li>
+                                <li>Pets: {{ characterData.Pets }}</li>
+                            </ul>
+                            <h2>Backstory</h2>
+                            <p>{{ characterData.Backstory }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="outerPage" id="createShop" v-if="currentOuterPage === 'createShop'">
+                <!-- Content for CreateShop page goes here -->
+            </section>
+            <section class="outerPage" id="help" v-if="currentOuterPage === 'help'">
+                <!-- Content for help page goes here -->
             </section>
         </div>
         <script src="vue.js"></script>

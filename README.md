@@ -1,20 +1,28 @@
 ## Coding:
+ - Multiple pages (Currently nationInfo and createPlayer are the only working pages) with their own functions
  - Nations are organized into folders, with data stored in JSON and HTML formats, accompanied by relevant images for each nation.
  - Backend powered by Flask, a Python-based web framework.
  - Frontend implemented using Vue framework, providing an interactive (GUI).
- - Automated process to compute information and seamlessly convert it into a fully functional website.
+ - Nations are store using html, json, and images
+ - Players are stored using json and images
+ - Shops will be stored using json and images
  - User-friendly GUI tool in development to enable easy creation and management of nations and players.
 
 ## Lore: (Note* Prone to Change)
-The project will remain OOC in case something irl happens and the project must stop. But at version 1.0.0 the project will move to a IC event in which player will access it through the echo book.
- - #### Later on the name "Map of Rivers" will be changed. This will apply to the interactive and the standalone maps.
-
-### Ideas
- - Based off "programma" (not end name), the magical power from the time of the Copperheart. Located around the world are towers with the largest tower at the Copperhearts home. Transmitting data through the echo book. Protected and mantained by Copper-333, linked wirelessly to it.
+In working production, lore has been made and an event is being produced.
 
 # How to install:
 1. Either download a zip (remember to uncompress it) or use git clone through a terminal
-1.1. If already not in the terminal, proceed to open one.
+2. If downloaded through a zip, proceed to open a terminal.
 3. cd into the project directory
-4. Run; linux: python(3) server.py / windows: py -[version] server.py
-5. Open your prefured web browser and go to http://127.0.0.1:5000
+4. Run:
+   - Linux: `python pip install flask`
+   - Windows: `pip install flask`
+5. Run:
+   - Linux: `python server.py`
+   - Windows: `python(3) server.py`
+6. Open your preferred web browser and go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
+7. If you have NoScript, remember to allow the 127.0.0.1 script
+
+### Thanks to:
+ - **@siegemaza** -> Helped fix the install process for windows based devices.
