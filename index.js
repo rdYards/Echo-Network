@@ -9,8 +9,19 @@ function loadImage(src) {
 
 Vue.component('player-info', {
     props: ['player'],
+    data() {
+        return {
+            isCollapsibleOpen: false
+        };
+    },
+    methods: {
+        toggleCollapsible() {
+            this.isCollapsibleOpen = !this.isCollapsibleOpen;
+        }
+    },
     template: `
     <div v-if="player">
+    <div class="creation">
         <button type="button" class="collapsible" @click="toggleCollapsible()">
             {{ player.IC_Name }}, {{ player.IC_Nickname }} - ({{ player.OOC_Discord_Name }})
         </button>
@@ -55,35 +66,90 @@ Vue.component('player-info', {
             <p>{{ player.Backstory }}</p>
         </div>
     </div>
+    </div>
     <div v-else>
         <!-- Render a loading message or handle the case when playerData is not yet available -->
         <p>Loading player data...</p>
     </div>`
 });
+Vue.component('shop-info', {
+    props: ['shop'],
+    data() {
+        return {
+            isCollapsibleOpen: false
+        };
+    },
+    methods: {
+        toggleCollapsible() {
+            this.isCollapsibleOpen = !this.isCollapsibleOpen;
+        }
+    },
+    template: `
+    <div v-if="shop">
+    <div class="creation">
+        <button type="button" class="collapsible" @click="toggleCollapsible">{{ shop.Name }}</button>
+        <div class="content" v-show="isCollapsibleOpen">
+            <img class="profile" :src="shop.ImageLocation" alt="Shop Image">
+            <ul class="list">
+                <li>Location(s): {{ shop.Locations }}</li>
+                <li>Offers: {{ shop.Offers }}</li>
+                <li>Accepts: {{ shop.Accepts }}</li>
+            </ul>
+            <h2>Inventory</h2>
+            <ul class="list">
+                <li v-for="item in shop.Inventory" :key="item">{{ item }}</li>
+            </ul>
+        </div>
+    </div>
+    </div>
+    <div v-else>
+        <!-- Render a loading message or handle the case when shopData is not yet available -->
+        <p>Loading shop data...</p>
+    </div>
+    `
+});
+
 
 const app = new Vue({
     el: '#app',
     data: {
-        selectedNation: '', // Stores the currently selected nation
+        // Pop-up and checkbox states
+        showPopUp: false,
+        isChecked: false,
+
+        // Nation selection
+        selectedNation: '',
         nations: [],
+
+        // Navigation and page tracking
         currentOuterPage: 'nationInfo',
-        createNation: '',
-        createPlayer: '',
-        createShop: '',
         pages: ['History', 'Geography', 'Players', 'Economy'],
-        currentPage: 'History', // To track the currently selected page
-        htmlContent: '',
-        geohtmlContent: '',
+        currentPage: 'History',
+
+        // HTML content for various sections
+        history_htmlContent: '',
+        geography_htmlContent: '',
+        shophtmlContent: '',
+
+        // Player and member data
         allPlayers: [],
         filteredPlayers: [],
-        shophtmlContent: '',
-        referencedImages: [], // To store the referenced images
+        members: [],
+
+        // Shop and economy data
+        allShops: [],
+        filteredShops: [],
+        economy: [],
+
+        // Modal visibility
         showModal: false,
-        availableFiles: [], // Store the list of available player files
+
+        // Character data
         characterData: {
             IC_Name: '',
             IC_Nickname: '',
             OOC_Discord_Name: '',
+            Nomad: false,
             ImageLocation: null,
             Titles: '',
             Age: '',
@@ -110,62 +176,27 @@ const app = new Vue({
             Friends: '',
             Enemies: '',
             Pets: '',
-            Backstory: '',
+            Backstory: ''
         },
+
+        // Shop data
+        shopData: {
+            Name: '',
+            Nomad: false,
+            ImageLocation: null,
+            Offers: '',
+            Accepts: '',
+            Locations: '',
+            Inventory: ''
+        }
     },
     methods: {
-        // Method to fetch the list of nations from the server
-        fetchNations() {
-            fetch('/get_nations')
-                .then(response => response.json())
-                .then(data => {
-                    this.nations = data; // Update the nations array with the fetched data
-                    // console.log(this.nations);
-
-                    // Default to opening the first nation
-                    if (this.nations.length > 0) {
-                        this.selectedNation = this.nations[0];
-                        this.fetchHistory(this.selectedNation); // Fetch history data for the selected nation
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching nations:', error);
-                });
-        },
-        selectNation(nationName) {
-            this.selectedNation = nationName;
-            this.currentPage = 'History'; // Reset to the History page when a new nation is selected
-            this.fetchHistory(nationName); // Fetch history data for the selected nation
-        },
-        updateTitleSection(nationName) {
-            this.selectedNation = nationName;
-            const imageSrc = `/Nations/${nationName}/Nation_Flag.png`;
-
-            loadImage(imageSrc)
-            .then(() => {
-                // The rest of the image loading logic
-                // Get the element that will hold the image
-                const titleSection = document.getElementById('selected_nation_img');
-                if (titleSection) {
-                    // Clear any existing image
-                    titleSection.innerHTML = '';
-
-                    // Create an img element
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imageSrc;
-                    imgElement.alt = 'Nation Flag';
-
-                    // Append the img element to the title section
-                    titleSection.appendChild(imgElement);
-                }
-            })
-            .catch(error => {
-                console.error(`Error loading Nation_Flag for ${nationName}:`, error);
-            });
-        },
+        // Section: Page Changer
+        // Function to select and display a specific page within the current view
         selectPage(page) {
-            // Update the current page
             this.currentPage = page;
+
+            // Depending on the selected page, fetch and display relevant data
             switch (page) {
                 case 'History':
                     this.fetchHistory(this.selectedNation);
@@ -174,150 +205,228 @@ const app = new Vue({
                     this.fetchGeography(this.selectedNation);
                     break;
                 case 'Players':
-                    this.fetchPlayers(this.selectedNation);
+                    this.fetchFilteredPlayers(this.selectedNation);
                     break;
                 case 'Economy':
-                    this.fetchShop(this.selectedNation);
+                    this.fetchFilteredShops(this.selectedNation);
                     break;
             }
         },
+        // Function to select and display a specific outer page within the current view
         selectOuterPage(page) {
-            // Update the current page
             this.currentOuterPage = page;
-            switch (page) {
-                case 'Home':
-                    // Insert Work here
-                    break;
-                case 'CreateNation':
-                    // Insert Work here
-                    break;
-                case 'CreatePlayer':
-                    // Insert Work here
-                    break;
-                case 'CreateShop':
-                    // Insert Work here
-                    break;
-            }
         },
-        // Method to fetch history data for the selected nation from the server
-        fetchHistory(nationName) {
-            fetch(`/history/${nationName}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.html_content) {
-                    this.htmlContent = data.html_content;
-                    } else {
-                    this.htmlContent = '';
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error fetching history for ${nationName}:`, error);
-                });
+        // Function to select a nation and update displayed content accordingly
+        selectNation(nationName) {
+            this.selectedNation = nationName;
+            this.currentPage = 'History'; // Set default page to 
+            this.fetchHistory(nationName); // Fetch and display historical data for the selected nation
         },
-        // Method to fetch history data for the selected nation from the server
-        fetchGeography(nationName) {
-            fetch(`/geography/${nationName}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.geohtml_content) {
-                    this.geohtmlContent = data.geohtml_content;
-                    } else {
-                    this.geohtmlContent = '';
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error fetching geography for ${nationName}:`, error);
-                });
-        },
-        fetchPlayerData(jsonFileName) {
-            return fetch(`/Players/${jsonFileName}.json`)
-                .then(response => response.json())
-                .catch(error => {
-                    console.error(`Error fetching player data (${jsonFileName}):`, error);
-                    return {}; // Return an empty object in case of an error
-                });
-        },
-        fetchPlayers() {
-            // Fetch player data for each JSON file in allplayers
-            const playerDataPromises = this.allplayers.map(player =>
-            this.fetchPlayerData(player.IC_Name)
-            );
 
-            Promise.allSettled(playerDataPromises)
-            .then(results => {
-                // Filter out the successfully fetched player data
-                const playerData = results
-                .filter(result => result.status === 'fulfilled')
-                .map(result => result.value);
+        // Section: Data Fetching Functions
+        // Function to fetch the list of nations from the server
+        fetchNations() {
+            fetch('/get_nations')
+            .then(response => response.json())
+            .then(data => {
+                this.nations = data;
 
-                // Update filteredPlayers with the fetched player data
-                this.filteredPlayers = playerData;
+                // Default to opening the first nation
+                if (this.nations.length > 0) {
+                    this.selectedNation = this.nations[0];
+                    this.fetchHistory(this.selectedNation);
+                }
             })
             .catch(error => {
-                console.error('Error fetching players data:', error);
+                console.error('Error fetching nations:', error);
             });
         },
-        fetchPlayersData() {
-            fetch(`/api/get_all_players`)
-                .then(response => response.json())
-                .then(data => {
-                    this.allplayers = data;
-                    this.filteredPlayers = this.allPlayers;
-                })
-                .catch(error => {
-                    console.error('Error fetching player data:', error);
-                });
+        // Function to fetch historical data for the selected nation from the server
+        fetchHistory(nationName) {
+            fetch(`/history/${nationName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.html_content) {
+                    this.history_htmlContent = data.html_content;
+                } else {
+                    this.history_htmlContent = '';
+                }
+            })
+            .catch(error => {
+                console.error(`Error fetching history for ${nationName}:`, error);
+            });
         },
-        fetchShop(nationName) {
-            fetch(`/get_shop/${nationName}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.html_files && Array.isArray(data.html_files)) {
-                        const htmlFileNames = data.html_files;
-
-                        // Fetch and load the HTML content for each player
-                        const shopHTMLPromises = htmlFileNames.map(htmlFileName =>
-                            this.fetchShopHTML(htmlFileName) // Use the fetchShopHTML function
-                        );
-
-                        Promise.allSettled(shopHTMLPromises)
-                            .then(results => {
-                                // Filter out the successfully fetched HTML content
-                                const shopHTMLContents = results
-                                    .filter(result => result.status === 'fulfilled')
-                                    .map(result => result.value);
-
-                                // Join the shop HTML contents to form the final content
-                                this.shophtmlContent = shopHTMLContents.join(''); // Update the variable name to shophtmlContent
-                            })
-                            .catch(error => {
-                                console.error('Error fetching shop HTML:', error);
-                            });
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error fetching shop data for ${nationName}:`, error);
-                });
+        // Function to fetch geographical data for the selected nation from the server
+        fetchGeography(nationName) {
+            fetch(`/geography/${nationName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.geohtml_content) {
+                    this.geography_htmlContent = data.geohtml_content;
+                } else {
+                    this.geography_htmlContent = '';
+                }
+            })
+            .catch(error => {
+                console.error(`Error fetching geography for ${nationName}:`, error);
+            });
         },
-        fetchShopHTML(htmlFileName) {
-            return fetch(`/Shops/${htmlFileName}.html`)
-                .then(response => response.text())
-                .catch(error => {
-                    console.error(`Error fetching HTML for ${htmlFileName}:`, error);
-                    return '';
-                });
+
+        // Section: UI Updates
+        // Function to update the title section with the selected nation's flag image
+        updateTitleSection(nationName) {
+            // Set the selected nation and image source
+            this.selectedNation = nationName;
+            const imageSrc = `/Nations/${nationName}/Nation_Flag.png`;
+
+            // Load the image
+            loadImage(imageSrc)
+            .then(() => {
+                const titleSection = document.getElementById('selected_nation_img');
+                if (titleSection) {
+                    // Clear any existing content
+                    titleSection.innerHTML = '';
+
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageSrc;
+                    imgElement.alt = 'Nation Flag';
+
+                    titleSection.appendChild(imgElement);
+                }
+            })
+            .catch(error => {
+                console.error(`Error loading Nation_Flag for ${nationName}:`, error);
+            });
         },
+        // Function to toggle collapsible content
         toggleCollapsible(event) {
             const collapsible = event.target;
             const content = collapsible.nextElementSibling;
             content.classList.toggle('active');
             content.style.maxHeight = content.classList.contains('active') ? content.scrollHeight + 'px' : 0;
         },
+        
+        // Section: Data Fetching - Player Information
+        // Function to fetch all player data from the server
+        fetchPlayersData() {
+            fetch(`/api/get_all_players`)
+            .then(response => response.json())
+            .then(data => {
+                this.allPlayers = data; // Update allPlayers with fetched data
+            })
+            .catch(error => {
+                console.error('Error fetching player data:', error);
+            });
+        },
+        // Function to fetch filtered player data for the selected nation from the server
+        fetchFilteredPlayers(nationName) {
+            fetch(`/get_players/${nationName}`)
+            .then(response => response.json())
+            .then(data => {
+                this.members = data.html_files; // Update members list with player data
+                this.filteredPlayers = this.allPlayers.filter(player =>
+                    this.members.includes(player.IC_Name) // Filter and update filteredPlayers
+                );
+            })
+            .catch(error => {
+                console.error(`Error fetching players for ${nationName}:`, error);
+            });
+        },
+
+        // Section: Data Fetching - Shop Information
+        // Function to fetch all shop data from the server
+        fetchShopsData() {
+            fetch(`/api/get_all_shops`)
+            .then(response => response.json())
+            .then(data => {
+                this.allShops = data; // Update allShops with fetched data
+            })
+            .catch(error => {
+                console.error('Error fetching shop data:', error);
+            });
+        },
+        // Function to fetch filtered shop data for the selected nation from the server
+        fetchFilteredShops(nationName) {
+            fetch(`/get_shops/${nationName}`)
+            .then(response => response.json())
+            .then(data => {
+                this.shopMembers = data.html_files; // Update shopMembers list with shop data
+                this.filteredShops = this.allShops.filter(shop =>
+                    this.shopMembers.includes(shop.Name) // Filter and update filteredShops
+                );
+            })
+            .catch(error => {
+                console.error(`Error fetching shops for ${nationName}:`, error);
+            });
+        },
+
+        // Section: UI Interaction - Pop-up and Data Loading
+        // Function to open the pop-up
+        openPopUp() {
+            this.showPopUp = true;
+        },
+        // Function to close the pop-up
+        closePopUp() {
+            this.showPopUp = false;
+        },
+        // Function to load character data for display in the pop-up
+        loadCharacterData(player) {
+            this.characterData = {
+                IC_Name: player.IC_Name,
+                IC_Nickname: player.IC_Nickname,
+                OOC_Discord_Name: player.OOC_Discord_Name,
+                Nomad: player.Nomad,
+                ImageLocation: player.ImageLocation,
+                Titles: player.Titles,
+                Age: player.Age,
+                Date_of_Birth: player.Date_of_Birth,
+                Gender: player.Gender,
+                Race: player.Race,
+                Professions: player.Professions,
+                Allegiance: player.Allegiance,
+                Residence: player.Residence,
+                Status: player.Status,
+                Height: player.Height,
+                Weight: player.Weight,
+                Hair_Color: player.Hair_Color,
+                Eye_Color: player.Eye_Color,
+                Scars_and_Tattoos: player.Scars_and_Tattoos,
+                Clothing: player.Clothing,
+                Accessories: player.Accessories,
+                Equiptment: player.Equiptment,
+                Physical_Description: player.Physical_Description,
+                Religion: player.Religion,
+                Nation: player.Nation,
+                Organizations: player.Organizations,
+                Marriage: player.Marriage,
+                Friends: player.Friends,
+                Enemies: player.Enemies,
+                Pets: player.Pets,
+                Backstory: player.Backstory
+            };
+            this.closePopUp();
+        },
+        // Function to load shop data for display in the pop-up
+        loadShopData(shop) {
+            this.shopData = {
+                Name: shop.Name,
+                Nomad: shop.Nomad,
+                ImageLocation: shop.ImageLocation,
+                Offers: shop.Offers,
+                Accepts: shop.Accepts,
+                Locations: shop.Locations,
+                Inventory: shop.Inventory
+            };
+            this.closePopUp();
+        },
+
+        // Section: Data Formatting - Clear Create Player and Shop Format
+        // Function to clear the format for creating a new player
         clearCreatePlayerFormat(characterData) {
             characterData.IC_Name = '';
             characterData.IC_Nickname = '';
             characterData.OOC_Discord_Name = '';
-            characterData.ImageLocation = null;
+            characterData.Nomad = false,
             characterData.ImageLocation = 'Players/images/';
             characterData.Titles = '';
             characterData.Age = '';
@@ -346,77 +455,157 @@ const app = new Vue({
             characterData.Pets = '';
             characterData.Backstory = '';
         },
+        // Function to clear the format for creating a new shop
+        clearCreateShopFormat(shopData) {
+            shopData.Name = '',
+            shopData.Nomad = false,
+            shopData.ImageLocation = null,
+            shopData.Offers = '',
+            shopData.Accepts = '',
+            shopData.Locations = '',
+            shopData.Inventory = ''
+        },
+
+        // Section: UI Interaction - Modal and Checkbox Handling
         // Method to hide the modal
         hideLoadPlayerModal() {
             this.showModal = false;
         },
+        // Function to handle file selection for character image
         onFileSelected(event) {
             this.characterData.Image = event.target.files[0];
         },
+        // Function to handle changes in the Nomad checkbox for player data
+        handlePlayerCheckboxChange(characterData) {
+            if (characterData.Nomad) {
+                characterData.Nomad = true;
+                this.isChecked = true;
+            } else {
+                characterData.Nomad = false;
+                this.isChecked = false;
+            }
+            console.log(characterData.Nomad);
+        },
+        
+        // Section: Data Saving - Create Player and Shop Data
+        // Function to save newly created player data
         saveCreatePlayerData() {
-            const fileName = this.characterData.IC_Name; // Remove '.json' extension from the filename
+            const fileName = this.characterData.IC_Name;
             const imageFile = this.$refs.imageInput.files[0];
+
             if (imageFile) {
                 const formData = new FormData();
                 formData.append('image', imageFile);
-                formData.append('fileName', fileName); // Provide the desired filename for the image
-        
-                fetch('/api/save_image', {
+                formData.append('fileName', fileName);
+
+                // Save the selected image for the player
+                fetch('/api/save_image/player', {
                     method: 'POST',
                     body: formData,
                 })
                 .then(response => response.json())
                 .then(imageData => {
                     console.log('Image saved successfully:', imageData);
-        
+
                     // Update the characterData.ImageLocation with the saved image location
                     this.characterData.ImageLocation = '/Players/images/' + imageData.fileName;
-                    fetch('/api/save_player_data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fileName: fileName + '.json', // Add back '.json' extension for saving the JSON file
-                            characterData: this.characterData,
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Character data saved successfully:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error while saving character data:', error);
-                    });
+
+                    // Proceed to save the player data
+                    this.savePlayerData(fileName);
                 })
                 .catch(error => {
                     console.error('Error while saving the image:', error);
                 });
             } else {
-                // If no image was selected, simply save the character data again without updating ImageLocation
-                fetch('/api/save_player_data', {
+                // If no image was selected, proceed to save the player data without updating ImageLocation
+                this.savePlayerData(fileName);
+            }
+        },
+        // Function to save player data
+        savePlayerData(fileName) {
+            // Send a POST request to save the player data on the server
+            fetch('/api/save_player_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fileName: fileName + '.json',
+                    characterData: this.characterData,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Character data saved successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error while saving character data:', error);
+            });
+        },
+        
+        // Function to save newly created shop data
+        saveCreateShopData() {
+            const fileName = this.shopData.Name.replace(/\s+/g, '_');
+            const imageFile = this.$refs.imageInput.files[0];
+
+            // Split Inventory string into an array by commas and trim whitespace
+            const inventoryArray = this.shopData.Inventory.split(',').map(item => item.trim());
+            this.shopData.Inventory = inventoryArray;
+
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                formData.append('fileName', fileName);
+
+                // Save the selected image for the shop
+                fetch('/api/save_image/shop', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fileName: fileName + '.json', // Add back '.json' extension for saving the JSON file
-                        characterData: this.characterData,
-                    }),
+                    body: formData,
                 })
                 .then(response => response.json())
-                .then(data => {
-                    console.log('Character data saved successfully:', data);
+                .then(imageData => {
+                    console.log('Image saved successfully:', imageData);
+
+                    // Update the shopData.ImageLocation with the saved image location
+                    this.shopData.ImageLocation = '/Shops/images/' + imageData.fileName;
+
+                    // Proceed to save the shop data
+                    this.saveShopData(fileName);
                 })
                 .catch(error => {
-                    console.error('Error while saving character data:', error);
+                    console.error('Error while saving the image:', error);
                 });
+            } else {
+                // If no image was selected, proceed to save the shop data without updating ImageLocation
+                this.saveShopData(fileName);
             }
+        },
+        // Function to save shop data
+        saveShopData(fileName) {
+            // Send a POST request to save the shop data on the server
+            fetch('/api/save_shop_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fileName: fileName + '.json',
+                    shopData: this.shopData,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Shop data saved successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error while saving shop data:', error);
+            });
         },
     },
     created() {
-        this.fetchNations();
-        this.fetchPlayersData();
+        this.fetchNations(); // Fetch list of nations from the server
+        this.fetchPlayersData(); // Fetch player data from the server
+        this.fetchShopsData() // Fetch shop data from the server
     },
     mounted() {
         this.$el.addEventListener('click', event => {

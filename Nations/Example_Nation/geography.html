@@ -1,29 +1,35 @@
+<!--
+    Geography Information Page
+
+    This page provides detailed information about the geography of your fictional world, including descriptions,
+    maps, and images of various regions, landscapes, and landmarks within your nations.
+
+    How to Add Images to Geography Information:
+
+    1. Prepare your image files in a suitable format (e.g., JPEG, PNG).
+    2. Insert your image files into the "images" directory.
+    3. To display images in this "geography.html" file, use the <img> HTML element with the "src" attribute set
+        to the relative path of your image files.
+
+    Example Image Insertion:
+
+    &lt;img src="Nations/Example_Nation/images/mountain.jpg" alt="Mountain Range"&gt;
+
+    Remember to replace "Example_Nation with the actual nation name.
+    
+    Explaining the Collapsible Content:
+    Use the following code below create a collapsible section that reveals content when clicked:
+    
+    Replace "Title" with the desired title for the collapsible section.
+    You can customize the content within the &lt;div class="content"&gt; element to display the details you want.
+
+    NOTE: Make sure to adjust names, and examples to match your project's structure and needs.
+-->
 <body>
-    <button type="button" class="collapsible" @click="toggleCollapsible">History of Example_Nation</button>
-    <div class="content">
-        <p>
-            Example_Nation is a fictional nation with a rich history. It was founded centuries ago by brave explorers
-            seeking a new land to call home. Over the years, the nation has grown and flourished, becoming a beacon of
-            prosperity and progress in the region.
-        </p>
-        <img src="Nations/Example_Nation/images/gauntlets.png" alt="photo one">
-    </div>
-    <button type="button" class="collapsible" @click="toggleCollapsible">History of Example_Nation</button>
-    <div class="content">
-        <p>
-            Example_Nation is a fictional nation with a rich history. It was founded centuries ago by brave explorers
-            seeking a new land to call home. Over the years, the nation has grown and flourished, becoming a beacon of
-            prosperity and progress in the region.
-        </p>
-        <img src="Nations/Example_Nation/images/Test_Flag_history.png" alt="photo one">
-    </div>
-    <button type="button" class="collapsible" @click="toggleCollapsible">History of Example_Nation</button>
-    <div class="content">
-        <p>
-            Example_Nation is a fictional nation with a rich history. It was founded centuries ago by brave explorers
-            seeking a new land to call home. Over the years, the nation has grown and flourished, becoming a beacon of
-            prosperity and progress in the region.
-        </p>
-        <img src="Nations/Example_Nation/images/gauntlets.png" alt="photo one">
-    </div>
+    <body>
+        <button type="button" class="collapsible" @click="toggleCollapsible">Title</button>
+        <div class="content">
+            
+        </div>
+    </body>
 </body>

@@ -1,13 +1,19 @@
 @font-face {
-    font-family: 'Ringbearer';
-    src: url('Fonts/RingbearerMedium-51mgZ.ttf') format('truetype');
+    font-family: 'Etharnigno';
+    src: url('Fonts/Etharnigno.otf') format('opentype');
+    font-weight: 400;
 }
+@font-face {
+    font-family: 'CardinalRegular';
+    src: url('Fonts/CardinalRegular.ttf') format('truetype');
+}
+
 /* Reset and general styling */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Ringbearer', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Etharnigno', 'CardinalRegular', 'Arial Narrow', Arial, sans-serif;
 }
 
 /* Page Navigation Bar */
@@ -38,10 +44,12 @@
 
 .outerPage {
     display: flex;
+} #createPlayer {
+    overflow: hidden;
 }
 .leftcreatePlayer {
     width: 50%;
-    height: 100%;
+    height: 100vh;
     overflow-y: auto;
     float: left;
     border-right: solid black;
@@ -49,48 +57,63 @@
     position: sticky;
     top: 0;
     width: 50%;
-    height: 100%;
+    height: 100vh;
     float: right;
 }
-#createPlayer section {
+.popup {
+    position: fixed;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 5;
+    margin: 5% 10%;
+    width: 80%;
+    height: 80%;
+    background-color: white;
+    border: 10px groove black;
+} .popup-sub {
+    padding: 2% .5%;
+}
+.createMenu section {
     border-bottom: groove black;
     width: 100%;
-} #createPlayer .playerhelp {
+} .createMenu .menuHelp {
     text-align: center;
-    font-size: 1.4vh;
-} #createPlayer h3 {
+    font-size: 1.8vh;
+} .createMenu h3 {
     text-align: center;
-    font-size: 2.2vh;
+    font-size: 2.7vh;
     padding-top: 2%;
-} #createPlayer h4 {
+} .createMenu h4 {
     padding-left: 10%;
-    font-size: 1.6vh;
-} #createPlayer input {
+    font-size: 2vh;
+} .createMenu input {
     margin: 0 5% 1.3% 5%;
     padding: .4% .7%;
     width: 90%;
-    font-size: 1.5vh;
+    font-size: 1.9vh;
     border-radius: 25px;
-} #createPlayer textarea {
+} .createMenu textarea {
     margin: 0 5% 1.3% 5%;
+    white-space: pre-wrap;
     padding: .5% .8%;
     width: 90%;
     resize: none;
-    font-size: 1.5vh;
+    font-size: 1.9vh;
     border-radius: 25px;
 }
-.createPlayerBtnBar {
+.createMenuBtnBar {
     display: flex;
-} .createPlayerBtn {
+} .createMenuBtn {
     cursor: pointer;
     flex: 1 0 20%;
     flex-basis: 20%;
     padding: .4vh;
     margin: .5vh;
-    font-size: larger;
+    font-size: 1.9vh;
+    font-weight: 900;
     background-color: #7777;
     border: solid black;
-} .createPlayerBtn:active {
+} .createMenuBtn:active {
     background-color: #555;
 } #imageInput {
     cursor: pointer;
@@ -98,7 +121,8 @@
     flex-basis: 20%;
     padding: .4vh;
     margin: .5vh;
-    font-size: larger;
+    font-size: 1.9vh;
+    font-weight: 900;
     background-color: #7777;
     border: solid black;
 }
@@ -129,14 +153,14 @@
 }
 .activebtn {
     color: white;
-    background-image: url(Backgrounds/Obsidian_Background.jpg)!important;
+    background-color: #555;
 }
 
 /* Button zone */
 .nationbar {
     flex-wrap: wrap;
     height: 40%;
-    background-image: url(Backgrounds/Spruce_Background.jpg);
+    background-color: brown;
     align-content: flex-start;
     flex-grow: 1;
 } .nationbtn {
@@ -144,12 +168,12 @@
     flex: 1 0 1%;
     padding: 15px;
     margin: 3px;
-    font-size: large;
-    font-weight: bolder;
-    background-image: url(Backgrounds/Stone_Background.jpg);
+    font-size: 1.9vh;
+    font-weight: 900;
+    background-color: #777;
     border: solid black;
 } .nationbtn:active {
-    background-image: url(Backgrounds/Blackstone_Background.jpg);
+    background-color: #555;
 }
 
 /* National Page Information */
@@ -175,7 +199,7 @@
     height: 6vh;
     border-bottom: solid;
 } .title p {
-    font-size: 6.3vh;
+    font-size: 6.5vh;
     padding: 1.2vh 1vh 1vh 1vh;
     font-weight: bolder;
     flex: 1;
@@ -195,16 +219,19 @@
     flex-basis: 20%;
     padding: .4vh;
     margin: .5vh;
-    font-size: larger;
-    background-image: url(Backgrounds/Stone_Background.jpg);
+    font-size: 1.9vh;
+    font-weight: 900;
+    background-color: #777;
     border: solid black;
 } .pagebtn:active {
-    background-image: url(Backgrounds/Blackstone_Background.jpg);
+    background-color: #555;
 }
 
 .infopage {
     width: 100%;
     flex: 1;
+    display: inherit;
+    flex-direction: column;
 }
 .image {
     float: right;
@@ -213,12 +240,12 @@
 
 /* Infopage content sections */
 #history h2 {
-    font-size: 2vh;
+    font-size: 2.4vh;
     text-align: center;
     padding: 1%;
 } #history p {
     padding: 0 1%;
-    font-size: 1.7vh;
+    font-size: 2.1vh;
     text-align: center;
 } #history img {
     padding: 1% 0;
@@ -227,32 +254,48 @@
     margin-right: auto;
     width: 50%;
 }
-#players {
-    display: inherit;
-    flex-direction: column;
-}
-#players h1 {
+
+.creation h1 {
     margin: .2%;
-} #players h2 {
+} #creation h2 {
     margin-top: 1%;
-} #players .profile {
+} .creation .profile {
     float: right;
     max-width: 20%;
     padding-top: 1.5%;
-} #players .list {
+} .creation .list {
     list-style-type: circle;
-} #players div {
+} .creation div {
     width: 100%;
+} .creation p {
+    white-space: pre-wrap;
 }
 
-#economy h2 {
-    margin-top: 1%;
-} #economy .ad {
-    margin: 1%;
+#help {
+    padding: 0 10%;
+    display: inherit;
+    flex-direction: column;
+} #help section {
+    margin-bottom: 1%;
+    background-color: #bababa;
+    text-align: center;
+    padding: 1% 0;
+    border-bottom: groove black;
+    width: 100%;
+    border-radius: 15px;
+} #help h1 {
+    font-size: 2.5vh;
+    text-align: center;
     padding: 1%;
-    background-color: white;
-    border: 5px solid black;
-    border-radius: 25px;
+} #help p {
+    padding: 1% 2%;
+    font-size: 2vh;
+    text-align: center;
+} #help ul {
+    font-weight: 900;
+    list-style-type: none;
+    font-size: 1.8vh;
+    padding: .5% 0;
 }
 
 /* Collapsible section */
@@ -266,17 +309,17 @@
     border: none;
     border-bottom: groove black;
     text-align: left;
-    font-size: 2vh;
+    font-size: 2.4vh;
 } .active, .collapsible:hover {
     background-color: #555;
 } .active + .content {
     max-height: 100vh;
 } .content {
     margin-bottom: 1vh;
-    font-size: 1.7vh;
+    font-size: 2.1vh;
     padding: 0 3%;
     background-color: #f1f1f1;
     max-height: 0;
-    overflow: hidden;
+    overflow: scroll;
     transition: max-height 0.3s ease-out;
 }

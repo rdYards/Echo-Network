@@ -22,13 +22,7 @@
                     <img class="map_underlay" src="LoreWorks_Map.png">
                     <!-- Update the nationbar section -->
                     <section class="nationbar">
-                        <button
-                            v-for="nation in nations"
-                            :key="nation"
-                            class="nationbtn"
-                            id="nation"
-                            @click="selectNation(nation)"
-                        >
+                        <button v-for="nation in nations" :key="nation" class="nationbtn" id="nation" @click="selectNation(nation)">
                             {{ nation }}
                         </button>
                     </section>
@@ -46,52 +40,48 @@
 
                     <!-- Update the pagenav section -->
                     <section class="pagenav">
-                        <button
-                            v-for="page in pages"
-                            :key="page"
-                            class="pagebtn"
-                            :class="{ activebtn: page === currentPage }"
-                            @click="selectPage(page)"
-                        >
+                        <button v-for="page in pages" :key="page" class="pagebtn" :class="{ activebtn: page === currentPage }" @click="selectPage(page)">
                             {{ page }}
                         </button>
                     </section>
                     
                     <!-- Update the infopage sections -->
                     <section class="infopage" id="history" v-if="currentPage === 'History'">
-                        <div v-html="htmlContent"></div>
+                        <div v-html="history_htmlContent"></div>
                     </section>
                     <section class="infopage" id="geography" v-if="currentPage === 'Geography'">
-                        <div v-html="geohtmlContent"></div>
+                        <div v-html="geography_htmlContent"></div>
                     </section>
                     <section class="infopage" id="players" v-if="currentPage === 'Players'">
-                        <player-info v-if="currentPage === 'Players'" v-for="(player, index) in filteredPlayers" :key="index" :player="player" />
+                        <player-info v-for="(player, index) in filteredPlayers" :key="index" :player="player" />
                     </section>
                     <section class="infopage" id="economy" v-if="currentPage === 'Economy'">
-                        <div v-html="shophtmlContent"></div>
+                        <shop-info v-for="(shop, index) in filteredShops" :key="index" :shop="shop" />
                     </section>
                 </section>
             </section>
             <section class="outerPage" id="createNation" v-if="currentOuterPage === 'createNation'">
                 <!-- Content for CreateNation page goes here -->
             </section>
-            <section class="outerPage" id="createPlayer" v-if="currentOuterPage === 'createPlayer'">
-                <div v-if="showModal" class="modal">
-                    <div class="modal-content">
-                        <h3>Select a Player:</h3>
-                        <ul>
-                            <li v-for="file in availableFiles" :key="file" @click="loadPlayerData(file)">{{ file }}</li>
-                        </ul>
-                        <button @click="hideLoadPlayerModal">Close</button>
+            <section class="outerPage createMenu" id="createPlayer" v-if="currentOuterPage === 'createPlayer'">
+                <div v-if="showPopUp" class="popup">
+                    <h3>Select a Player</h3>
+                    <div v-for="player in allPlayers" :key="player.id">
+                        <section class="popup-sub">
+                            <button class="createMenuBtn" @click="loadCharacterData(player)">{{ player.IC_Name }}, {{ player.IC_Nickname }}, - ({{ player.OOC_Discord_Name }})</button>
+                            <h2> Nation: {{ player.Nation }} </p>
+                            <h2> Physical Description: {{ player.Physical_Description }}
+                        </section>
                     </div>
+                    <button class="createMenuBtn" @click="closePopUp()">Close</button>
                 </div>
                 <div class="leftcreatePlayer">
                     <h3>Create Player</h3>
-                    <p class="playerhelp">To create a player just fill in the textareas. On the right side you will see a live preview of your character. When finished click on the save button and the file will be added to the servers. To edit hit the button "load".</p>
-                    <section class="createPlayerBtnBar">
-                        <button class="createPlayerBtn" @click="loadPlayerData(characterData)">Load Player</button>
-                        <button class="createPlayerBtn" @click="clearCreatePlayerFormat(characterData)">Clear Formate</button>
-                        <button class="createPlayerBtn" @click="saveCreatePlayerData()">Save Player</button>
+                    <p class="menuHelp">To create a player just fill in the textareas. On the right side you will see a live preview of your character. When finished click on the save button and the file will be added to the servers. To edit hit the button "load".</p>
+                    <section class="createMenuBtnBar">
+                        <button class="createMenuBtn" @click="openPopUp">Load Player</button>
+                        <button class="createMenuBtn" @click="clearCreatePlayerFormat(characterData)">Clear Formate</button>
+                        <button class="createMenuBtn" @click="saveCreatePlayerData()">Save Player</button>
                     </section>
                     <section>
                         <h3>Name</h3>
@@ -104,11 +94,13 @@
                     </section>
                     <section>
                         <h3>Load Character Image</h3>
-                        <p class="playerhelp">Note only upload one image!</p>
+                        <p class="menuHelp">Note only upload one image!</p>
                         <input type="file" ref="imageInput" @change="onFileSelected" accept="image/*">
                     </section>
                     <section>
                         <h3>General Info</h3>
+                        <h4>Nomad?</h4>
+                        <input type="checkbox" v-model="characterData.Nomad" @change="handlePlayerCheckboxChange(characterData)" />
                         <h4>Titles:</h4>
                         <input v-model="characterData.Titles" type="text" placeholder="Enter title">
                         <h4>Age:</h4>
@@ -217,15 +209,190 @@
                             </ul>
                             <h2>Backstory</h2>
                             <p>{{ characterData.Backstory }}</p>
+                            <br><br><br><br>
                         </div>
                     </div>
                 </div>
             </section>
-            <section class="outerPage" id="createShop" v-if="currentOuterPage === 'createShop'">
-                <!-- Content for CreateShop page goes here -->
+            <section class="outerPage createMenu" v-if="currentOuterPage === 'createShop'">
+                <div v-if="showPopUp" class="popup">
+                    <h3>Select a Shop</h3>
+                    <div v-for="shop in allShops" :key="shop.id">
+                        <section class="popup-sub">
+                            <button class="createMenuBtn" @click="loadShopData(shop)">{{ shop.Name }}</button>
+                            <h2> Locations: {{ shop.Locations }} </p>
+                            <h2> Accepts: {{ shop.Accepts }}
+                        </section>
+                    </div>
+                    <button class="createMenuBtn" @click="closePopUp()">Close</button>
+                </div>
+                <div class="leftcreatePlayer">
+                    <h3>Create Shop</h3>
+                    <p class="menuHelp">To create a shop just fill in the textareas. On the right side you will see a live preview of your character. When finished click on the save button and the file will be added to the servers. To edit hit the button "load".</p>
+                    <section class="createMenuBtnBar">
+                        <button class="createMenuBtn" @click="openPopUp">Load Player</button>
+                        <button class="createMenuBtn" @click="clearCreateShopFormat(shopData)">Clear Formate</button>
+                        <button class="createMenuBtn" @click="saveCreateShopData()">Save Shop</button>
+                    </section>
+                    <section>
+                        <h3>General</h3>
+                        <h4>Name:</h4>
+                        <input v-model="shopData.Name" type="text" placeholder="Enter Name">
+                        <h4>Offers:</h4>
+                        <input v-model="shopData.Offers" type="text" placeholder="Enter General Offers">
+                        <h4>Accepts:</h4>
+                        <input v-model="shopData.Accepts" type="text" placeholder="Enter Accepted Currency">
+                        <h4>Locations:</h4>
+                        <input v-model="shopData.Locations" type="text" placeholder="Enter Locations">
+                    </section>
+                    <section>
+                        <h3>Load Character Image</h3>
+                        <p class="menuHelp">Note only upload one image!</p>
+                        <input type="file" ref="imageInput" @change="onFileSelected" accept="image/*">
+                    </section>
+                    <section>
+                        <h3>Inventory</h3>
+                        <p class="menuHelp">For this section please seperate each item by a "," EX. 1 Stack of Dirt = 1 Shard, 2 Stack of Stone = 1 Shard</p>
+                        <textarea v-model="shopData.Inventory" rows="6" placeholder="Enter Inventory"></textarea>
+                    </section>
+                </div>
+                <div class="rightcreatePlayer">
+                    <div id="economy">
+                        <button type="button" class="collapsible" @click="toggleCollapsible">
+                            {{ shopData.Name }}
+                        </button>
+                        <div class="content" style="max-height: 100vh;">
+                            <h3>General</h3>
+                            <ul class="list">
+                                <li>Offers: {{ shopData.Offers }}</li>
+                                <li>Accepts: {{ shopData.Accepts }}</li>
+                                <li>Location(s): {{ shopData.Locations }}</li>
+                            </ul>
+                            <h3>Inventory</h3>
+                            <ul class="list">
+                                <li>{{ shopData.Inventory }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </section>
             <section class="outerPage" id="help" v-if="currentOuterPage === 'help'">
-                <!-- Content for help page goes here -->
+                <section>
+                    <h1>What is this project?</h1>
+                    <p>This open-source project is an extension to the Loreworks Minecraft server. The site offers quick and easy access to information such as Nations, Players, and Shops.</p>
+                </section>
+                <section>
+                    <h1>Who is an admin?</h1>
+                    <p>The current admins are:</p>
+                    <ul>
+                        <li>B29Flier</li>
+                    </ul>
+                    <p>To contact an admin go to Discord and look up the name above.</p>
+                </section>
+                <section>
+                    <h1>How to report an error?</h1>
+                    <p>To report an error contact an admin. When reporting an error please provide a screenshot after hitting F12.</p>
+                </section>
+                <section>
+                    <h1>How to report inaproiate content?</h1>
+                    <p>Contact an admin and tell what it is and where it is.</p>
+                </section>
+                <section>
+                    <h1>If I do wrong will I be punished?</h1>
+                    <p>Yes, this website is an extension of the discord and server. If your actions are guilty then you will be reported to the server's admins.</p>
+                </section>
+                <section>
+                    <h1>What rules apply to the website?</h1>
+                    <p>All rules which apply to the Loreworks ecosystem apply to the website. However, there are extensions to the rules listed below.</p>
+                </section>
+                <section>
+                    <h1>Is there anything that will result in an immediate ban from the website?</h1>
+                    <p>If any admin catches the following it will result in an immediate ban.</p>
+                    <ul>
+                        <li>Non-Native Javascript (This includes any Javascript alternatives)</li>
+                        <li>Porn or Gore</li>
+                </section>
+                <section>
+                    <h1>How to create a Nation?</h1>
+                    <p>To create a nation contact an admin on Discord. When you contact please have your Nation's:</p>
+                    <ul>
+                        <li> Name </li>
+                        <li> Flag </li>
+                        <li> History </li>
+                        <li> Geography </li>
+                        <li> Players </li>
+                        <li> Economy </li>
+                        <li> Any images </li>
+                    </ul>
+                    <p>To add a character to your nation verify the user(s) have created a player at the Create Player page. Once created you will only need to tell the admin the IC_Name of that character</p>
+                    <p>The same logic applies to any shops found in your nation. Make sure the shop is created and only give the shop's name to the admin.</p>
+                </section>
+                <section>
+                    <h1>What if I want to create a nation myself?</h1>
+                    <p>You can create a nation without admin help by going to the GitHub link provided at the bottom of the navigation bar. There you will find a nation example folder, download it and fill it out yourself. When done contact an admin and hand over the folder for review.</p>
+                </section>
+                <section>
+                    <h1>I want to create my nation-specific website how do I do it?</h1>
+                    <p>While there is no hosting support contact an admin and download the open-sourced code available on GitHub.</p>
+                </section>
+                <section>
+                    <h1>How to create a Player?</h1>
+                    <p>To create a player go to the Create Player page (2nd top of navigation bar)</p>
+                    <p>Once loaded just fill in the slots while seeing a preview on the right side of the creation menu. <br>Note* you can not preview your player image but will be able to see it once added to a nation.</p>
+                </section>
+                <section>
+                    <h1>I have 300 pages of lore for my character, should I add all of it?</h1>
+                    <p>NO, the website function is easy and quick access to information. If you want to add large amount of information please head to the Loreworks Fandom. Try to keep information to the bare essentials.</p>
+                </section>
+                <section>
+                    <h1>How to have more than one image for a character?</h1>
+                    <p>Not possible currently, you only get one image per character</p>
+                </section>
+                <section>
+                    <h1>How to edit a character</h1>
+                    <p>To edit a character you only need to have the IC_Name match with the previous character (Note* capitals are looked for). However, if you cannot remember your character's name then hit the "Load Player" button. </p>
+                </section>
+                <section>
+                    <h1>How to create a Shop?</h1>
+                    <p>To create a shop go to the Create Shop page (3rd top of navigation bar)</p>
+                    <p>Once loaded just fill in the slots while seeing a preview on the right side of the creation menu. <br>Note* you can not preview your player image but will be able to see it once added to a nation.</p>
+                </section>
+                <section>
+                    <h1>How to have more than one image for a shop?</h1>
+                    <p>Not possible currently, you only get one image per shop</p>
+                </section>
+                <section>
+                    <h1>How to edit a shop</h1>
+                    <p>To edit a shop you only need to have the Shop's Name match with the previous shop (Note* capitals are looked for). However, if you cannot remember your shop's name then hit the "Load Shop" button. </p>
+                </section>
+                <section>
+                    <h1>I clicked the collapse button in the player/shop creation how do I fix it?</h1>
+                    <p>Currently no fix, manually save or save your character/shop onto the website and refresh the page.</p>
+                </section>
+                <section>
+                    <h1>I saved a character/shop with the wrong information how do I delete it?</h1>
+                    <p>To delete any character/shop contact an admin. This function is not possible for any normal user.</p>
+                </section>
+                <section>
+                    <h1>I cleared my player/shop but the image remained</h1>
+                    <p>For both the Create Player and Create Shop when you hit "Clear Formate" it will not remove the uploaded image.</p>
+                </section>
+                <section>
+                    <h1>I am not part of a Nation can I still create a player/shop?</h1>
+                    <p>YES, this website is nomad friendly. No matter who you are just hit the Nomad button and you player/shop will be auto added to the Nomads "Nation"</p>
+                </section>
+                <section>
+                    <h1>I do not want my player/shop added to the Nomad's "Nation"</h1>
+                    <p>To prevent your player/shop from showing up in Nomads section just don't click the "Nomad?" button</p>
+                </section>
+                <section>
+                    <h1>I want to add history or geography to Nomads, how?</h1>
+                    <p>To add information to the Nomads contact an admin and give the information you want to add.</p>
+                </section>
+                <section>
+                    <h1>Open Source? GitHub?</h1>
+                    <p>Github is a code hosting site. Open-source means the code is available to everyone for free.</p>
+                </section>
             </section>
         </div>
         <script src="vue.js"></script>
