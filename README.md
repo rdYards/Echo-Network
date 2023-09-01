@@ -49,7 +49,7 @@ Follow these steps to install and run the project on your local machine:
 - Nomad Friendly: Nomads can create players/shops; choose "Nomad?" to be included in the Nomads.
 ## Lore
 
-Provide a brief overview of the lore aspect of your project, if applicable. Mention any ongoing events or developments related to the lore.
+lore, lore, lore
 
 ## Thanks to
 
