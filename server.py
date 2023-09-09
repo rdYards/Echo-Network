@@ -26,9 +26,9 @@ def serve_vue_app():
 def serve_vue():
     return send_from_directory('', 'vue.js')
 
-@app.route('/index.js')
+@app.route('/main.js')
 def serve_js():
-    return send_from_directory('', 'index.js')
+    return send_from_directory('', 'main.js')
 
 @app.route('/style.css')
 def serve_css():
@@ -42,9 +42,9 @@ def get_available_files():
     return jsonify(files=available_files)
 
 # Serve the LoreWorks map image
-@app.route('/LoreWorks_Map.png')
+@app.route('/LoreWorks_Map.webp')
 def serve_map():
-    return send_from_directory('', 'LoreWorks_Map.png')
+    return send_from_directory('', 'LoreWorks_Map.webp')
 
 # Serve Fonts and Icons
 @app.route('/Fonts/<filename>')
@@ -67,10 +67,10 @@ def get_nations():
     nations_list = get_nations_list()
     return jsonify(nations_list)
 
-# Serve the Nation_Flag.png image for a nation
-@app.route('/Nations/<nation_name>/Nation_Flag.png')
+# Serve the Nation_Flag.webp image for a nation
+@app.route('/Nations/<nation_name>/Nation_Flag.webp')
 def serve_nation_flag(nation_name):
-    return send_from_directory('Nations/' + nation_name, 'Nation_Flag.png')
+    return send_from_directory('Nations/' + nation_name, 'Nation_Flag.webp')
 
 # Endpoint to fetch history HTML data for a nation
 @app.route('/history/<nation_name>')
