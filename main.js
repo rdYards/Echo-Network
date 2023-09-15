@@ -23,7 +23,7 @@ Vue.component('player-info', {
     <div v-if="player">
     <div class="creation">
         <button type="button" class="collapsible" @click="toggleCollapsible()">
-            {{ player.IC_Name }}, {{ player.IC_Nickname }} - ({{ player.OOC_Discord_Name }})
+            {{ player.CleanedName }}, {{ player.IC_Nickname }} - ({{ player.OOC_Discord_Name }})
         </button>
         <div class="content">
             <img class="profile" :src="player.ImageLocation" :alt="player.IC_Name">
@@ -87,7 +87,7 @@ Vue.component('shop-info', {
     template: `
     <div v-if="shop">
     <div class="creation">
-        <button type="button" class="collapsible" @click="toggleCollapsible">{{ shop.Name }}</button>
+        <button type="button" class="collapsible" @click="toggleCollapsible">{{ shop.CleanedName }}</button>
         <div class="content" v-show="isCollapsibleOpen">
             <img class="profile" :src="shop.ImageLocation" alt="Shop Image">
             <ul class="list">
@@ -118,8 +118,10 @@ const app = new Vue({
         isChecked: false,
 
         // Nation selection
-        selectedNation: '',
         nations: [],
+        cleanedNations: [],
+        selectedNation: '',
+        cleanedSelectedNation: '',
 
         // Navigation and page tracking
         currentOuterPage: 'nationInfo',
@@ -147,6 +149,7 @@ const app = new Vue({
         // Character data
         characterData: {
             IC_Name: '',
+            CleanedName: '',
             IC_Nickname: '',
             OOC_Discord_Name: '',
             Nomad: false,
@@ -182,6 +185,7 @@ const app = new Vue({
         // Shop data
         shopData: {
             Name: '',
+            CleanedName: '',
             Nomad: false,
             ImageLocation: null,
             Offers: '',
@@ -221,6 +225,7 @@ const app = new Vue({
             this.selectedNation = nationName;
             this.currentPage = 'History'; // Set default page to 
             this.fetchHistory(nationName); // Fetch and display historical data for the selected nation
+            this.cleanedSelectedNation = nationName.replace(/_/g, ' ');
         },
 
         // Section: Data Fetching Functions
@@ -230,11 +235,14 @@ const app = new Vue({
             .then(response => response.json())
             .then(data => {
                 this.nations = data;
-
+                
                 // Default to opening the first nation
                 if (this.nations.length > 0) {
-                    this.selectedNation = this.nations[0];
-                    this.fetchHistory(this.selectedNation);
+                    this.selectNation(this.nations[0]);
+
+                    for (let i = 0; i < this.nations.length; i++) {
+                        this.cleanedNations[i] = this.nations[i].replace(/_/g, ' ');
+                    }
                 }
             })
             .catch(error => {
@@ -484,12 +492,13 @@ const app = new Vue({
                 characterData.Nomad = false;
                 this.isChecked = false;
             }
-            console.log(characterData.Nomad);
         },
         
         // Section: Data Saving - Create Player and Shop Data
         // Function to save newly created player data
         saveCreatePlayerData() {
+            this.characterData.CleanedName = this.characterData.IC_Name;
+            this.characterData.IC_Name = this.characterData.CleanedName.replace(/\s+/g, '_');
             const fileName = this.characterData.IC_Name;
             const imageFile = this.$refs.imageInput.files[0];
 
@@ -545,7 +554,9 @@ const app = new Vue({
         
         // Function to save newly created shop data
         saveCreateShopData() {
-            const fileName = this.shopData.Name.replace(/\s+/g, '_');
+            this.shopData.CleanedName = this.shopData.Name;
+            this.shopData.Name = this.shopData.CleanedName.replace(/\s+/g, '_');
+            const fileName = this.shopData.Name;
             const imageFile = this.$refs.imageInput.files[0];
 
             // Split Inventory string into an array by commas and trim whitespace

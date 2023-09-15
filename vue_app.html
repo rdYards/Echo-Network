@@ -23,16 +23,16 @@
                     <img class="map_underlay" src="LoreWorks_Map.webp">
                     <!-- Update the nationbar section -->
                     <section class="nationbar">
-                        <button v-for="nation in nations" :key="nation" class="nationbtn" id="nation" @click="selectNation(nation)">
+                        <button v-for="(nation, index) in cleanedNations" :key="index" class="nationbtn" id="nation" @click="selectNation(nations[index])">
                             {{ nation }}
-                        </button>
+                        </button>                        
                     </section>
                 </section>
                 <!-- Update the nationinfo section -->
                 <section class="nationinfo">
                     <!-- Update the title section -->
                     <section class="title">
-                        <p id="selected_nation">{{ selectedNation }}</p>
+                        <p id="selected_nation">{{ cleanedSelectedNation }}</p>
                         <div id="selected_nation_img">
                             <!-- The Nation_Flag image will be loaded here -->
                             <img :src="`/Nations/${selectedNation}/Nation_Flag.webp`" alt="Nation Flag">
@@ -101,7 +101,7 @@
                     <section>
                         <h3>General Info</h3>
                         <h4>Nomad?</h4>
-                        <input type="checkbox" v-model="characterData.Nomad" @change="handlePlayerCheckboxChange(characterData)" />
+                        <input type="checkbox" id="nomadCheckBox" v-model="characterData.Nomad" @change="handlePlayerCheckboxChange(characterData)"/>
                         <h4>Titles:</h4>
                         <input v-model="characterData.Titles" type="text" placeholder="Enter title">
                         <h4>Age:</h4>
